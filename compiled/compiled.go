@@ -10,7 +10,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/vibefiledev/vibe/parser"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 // LockFile records the inputs that produced a compiled script so we can detect

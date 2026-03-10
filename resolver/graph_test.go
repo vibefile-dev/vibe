@@ -3,7 +3,7 @@ package resolver
 import (
 	"testing"
 
-	"github.com/vibefiledev/vibe/parser"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 func vibefile(targets map[string]*parser.Target) *parser.Vibefile {
@@ -50,10 +50,10 @@ func TestResolveLinearChain(t *testing.T) {
 
 func TestResolveDiamond(t *testing.T) {
 	vf := vibefile(map[string]*parser.Target{
-		"a":    target("a"),
-		"b":    target("b", "a"),
-		"c":    target("c", "a"),
-		"d":    target("d", "b", "c"),
+		"a": target("a"),
+		"b": target("b", "a"),
+		"c": target("c", "a"),
+		"d": target("d", "b", "c"),
 	})
 	order, err := Resolve(vf, "d")
 	if err != nil {

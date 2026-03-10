@@ -1,6 +1,6 @@
 model  = claude-sonnet-4-6
 name   = vibe
-module = github.com/vibefiledev/vibe
+module = github.com/vibefile-dev/vibe
 
 # ── build & test ──────────────────────────────
 

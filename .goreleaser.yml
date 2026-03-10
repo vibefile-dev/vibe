@@ -4,7 +4,7 @@ builds:
   - binary: vibe
     ldflags:
       - -s -w
-      - -X github.com/vibefiledev/vibe/cmd.version={{.Version}}
+      - -X github.com/vibefile-dev/vibe/cmd.version={{.Version}}
     flags:
       - -trimpath
     goos:

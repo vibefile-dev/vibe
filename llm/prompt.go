@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	vibecontext "github.com/vibefiledev/vibe/context"
-	"github.com/vibefiledev/vibe/parser"
+	vibecontext "github.com/vibefile-dev/vibe/context"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 const systemPrompt = `You are a task runner. Your job is to generate a shell script that accomplishes the described task.

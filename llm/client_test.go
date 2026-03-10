@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	vibecontext "github.com/vibefiledev/vibe/context"
-	"github.com/vibefiledev/vibe/parser"
+	vibecontext "github.com/vibefile-dev/vibe/context"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 func TestCleanScriptPlain(t *testing.T) {

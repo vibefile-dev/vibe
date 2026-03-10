@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vibefiledev/vibe/detect"
+	"github.com/vibefile-dev/vibe/detect"
 )
 
 func init() { detect.RegisterTemplate(&TemplateProvider{}) }

@@ -1,17 +1,17 @@
 # vibe
 
-AI-powered task runner driven by plain-English recipes. An MVP implementation of the [Vibefile spec](https://github.com/vibefiledev/spec).
+AI-powered task runner driven by plain-English recipes. An MVP implementation of the [Vibefile spec](https://github.com/vibefile-dev/spec).
 
 ## Install
 
 ```bash
-go install github.com/vibefiledev/vibe@latest
+go install github.com/vibefile-dev/vibe@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/vibefiledev/vibe.git
+git clone https://github.com/vibefile-dev/vibe.git
 cd vibe
 go build -o vibe .
 ```

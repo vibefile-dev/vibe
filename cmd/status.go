@@ -7,10 +7,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/vibefiledev/vibe/compiled"
-	"github.com/vibefiledev/vibe/config"
-	vibecontext "github.com/vibefiledev/vibe/context"
-	"github.com/vibefiledev/vibe/ui"
+	"github.com/vibefile-dev/vibe/compiled"
+	"github.com/vibefile-dev/vibe/config"
+	vibecontext "github.com/vibefile-dev/vibe/context"
+	"github.com/vibefile-dev/vibe/ui"
 )
 
 var statusCmd = &cobra.Command{

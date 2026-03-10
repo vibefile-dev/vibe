@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vibefiledev/vibe/resolver"
-	"github.com/vibefiledev/vibe/ui"
+	"github.com/vibefile-dev/vibe/resolver"
+	"github.com/vibefile-dev/vibe/ui"
 )
 
 var checkCmd = &cobra.Command{

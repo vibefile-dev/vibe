@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/vibefiledev/vibe/parser"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 func loadVibefile(repoRoot string) (*parser.Vibefile, error) {

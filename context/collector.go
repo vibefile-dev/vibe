@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/vibefiledev/vibe/parser"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 // Collected holds the gathered repo context sent to the LLM.

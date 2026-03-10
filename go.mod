@@ -1,4 +1,4 @@
-module github.com/vibefiledev/vibe
+module github.com/vibefile-dev/vibe
 
 go 1.25.0
 

@@ -2,7 +2,7 @@ recipe: run go mod tidy on the module
 model: claude-sonnet-4-6
 variables:
     model: claude-sonnet-4-6
-    module: github.com/vibefiledev/vibe
+    module: github.com/vibefile-dev/vibe
     name: vibe
 context_files:
     Vibefile: sha256:419bbb82b545f6eefdea083b8e0757a098ca9b086e786a3e14e3384100b62a6a

@@ -8,14 +8,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vibefiledev/vibe/compiled"
-	"github.com/vibefiledev/vibe/config"
-	vibecontext "github.com/vibefiledev/vibe/context"
-	"github.com/vibefiledev/vibe/executor"
-	"github.com/vibefiledev/vibe/llm"
-	"github.com/vibefiledev/vibe/parser"
-	"github.com/vibefiledev/vibe/resolver"
-	"github.com/vibefiledev/vibe/ui"
+	"github.com/vibefile-dev/vibe/compiled"
+	"github.com/vibefile-dev/vibe/config"
+	vibecontext "github.com/vibefile-dev/vibe/context"
+	"github.com/vibefile-dev/vibe/executor"
+	"github.com/vibefile-dev/vibe/llm"
+	"github.com/vibefile-dev/vibe/parser"
+	"github.com/vibefile-dev/vibe/resolver"
+	"github.com/vibefile-dev/vibe/ui"
 )
 
 const defaultMaxRetries = 1

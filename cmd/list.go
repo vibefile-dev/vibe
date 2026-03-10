@@ -8,8 +8,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/vibefiledev/vibe/parser"
-	"github.com/vibefiledev/vibe/ui"
+	"github.com/vibefile-dev/vibe/parser"
+	"github.com/vibefile-dev/vibe/ui"
 )
 
 var listCmd = &cobra.Command{

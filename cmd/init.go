@@ -9,16 +9,16 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vibefiledev/vibe/detect"
-	_ "github.com/vibefiledev/vibe/detect/cloudflare"
-	_ "github.com/vibefiledev/vibe/detect/docker"
-	_ "github.com/vibefiledev/vibe/detect/fly"
-	_ "github.com/vibefiledev/vibe/detect/golang"
-	_ "github.com/vibefiledev/vibe/detect/helm"
-	_ "github.com/vibefiledev/vibe/detect/makefile"
-	_ "github.com/vibefiledev/vibe/detect/nextjs"
-	_ "github.com/vibefiledev/vibe/detect/vercel"
-	"github.com/vibefiledev/vibe/ui"
+	"github.com/vibefile-dev/vibe/detect"
+	_ "github.com/vibefile-dev/vibe/detect/cloudflare"
+	_ "github.com/vibefile-dev/vibe/detect/docker"
+	_ "github.com/vibefile-dev/vibe/detect/fly"
+	_ "github.com/vibefile-dev/vibe/detect/golang"
+	_ "github.com/vibefile-dev/vibe/detect/helm"
+	_ "github.com/vibefile-dev/vibe/detect/makefile"
+	_ "github.com/vibefile-dev/vibe/detect/nextjs"
+	_ "github.com/vibefile-dev/vibe/detect/vercel"
+	"github.com/vibefile-dev/vibe/ui"
 )
 
 var (

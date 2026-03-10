@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vibefiledev/vibe/parser"
+	"github.com/vibefile-dev/vibe/parser"
 )
 
 func TestHashableFilesEmpty(t *testing.T) {
