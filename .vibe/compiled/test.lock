@@ -1,0 +1,11 @@
+recipe: run all Go tests in every package with verbose output and race detection enabled
+model: claude-sonnet-4-6
+variables:
+    model: claude-sonnet-4-6
+    module: github.com/vibefiledev/vibe
+    name: vibe
+context_files:
+    Vibefile: sha256:7ccc4837d0b5157fb2fe167eabf2601d1f7c159875fc266f134f74b6e622826f
+    go.mod: sha256:91a1588eed67a8aca61ed7f49fbb42a788bfb1d04f28491506a48037305d65ec
+script_hash: sha256:34b361492525c9673a4a6205d3c3af5cee2d9bf7353e4f2576de2c219f129e58
+generated_at: 2026-03-10T04:41:40.909474Z
