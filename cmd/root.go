@@ -9,8 +9,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "vibe",
-	Short: "AI-powered task runner driven by plain-English recipes",
+	Use:     "vibe",
+	Version: version,
+	Short:   "AI-powered task runner driven by plain-English recipes",
 	Long: `Vibe is a task runner that reads a Vibefile — a Makefile-like config where
 recipes are written in plain English instead of shell commands. An LLM
 translates your intent into executable shell scripts at runtime.`,
@@ -32,6 +33,8 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+var version = "dev"
 
 var (
 	apiKeyFlag string

@@ -19,6 +19,9 @@ fmt:
 vet:
     "run go vet on all packages in the module"
 
+deploy-local: build:
+    "copy the binary to /usr/local/bin"
+
 # ── quality gates ─────────────────────────────
 
 check: fmt vet lint test:

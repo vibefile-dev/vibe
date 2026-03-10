@@ -1,4 +1,4 @@
-recipe: compile the Go binary named vibe from the module root
+recipe: copy the binary to /usr/local/bin
 model: claude-sonnet-4-6
 variables:
     model: claude-sonnet-4-6
@@ -7,5 +7,5 @@ variables:
 context_files:
     Vibefile: sha256:7ccc4837d0b5157fb2fe167eabf2601d1f7c159875fc266f134f74b6e622826f
     go.mod: sha256:91a1588eed67a8aca61ed7f49fbb42a788bfb1d04f28491506a48037305d65ec
-script_hash: sha256:133b18038740b117f33b71100dac57ac66da5a51b4dcba317c260d469195782c
-generated_at: 2026-03-10T04:36:46.013495Z
+script_hash: sha256:2f8a22596af443741aa9077590c5a8648f7a87fcfe9237fb2d62e80683094734
+generated_at: 2026-03-10T04:36:48.984471Z
