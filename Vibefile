@@ -1,0 +1,34 @@
+model  = claude-sonnet-4-6
+name   = vibe
+module = github.com/vibefiledev/vibe
+
+# ── build & test ──────────────────────────────
+
+build:
+    "compile the Go binary named $(name) from the module root"
+
+test:
+    "run all Go tests in every package with verbose output and race detection enabled"
+
+lint:
+    "run golangci-lint on the entire module. if golangci-lint is not installed, install it first using go install"
+
+fmt:
+    "format all .go files using gofmt -s -w and then run go mod tidy"
+
+vet:
+    "run go vet on all packages in the module"
+
+# ── quality gates ─────────────────────────────
+
+check: fmt vet lint test:
+    "print a summary of what passed — all quality gates complete"
+
+
+# ── housekeeping ──────────────────────────────
+
+clean:
+    "remove the $(name) binary and the dist/ directory if they exist"
+
+install: build:
+    "move the compiled $(name) binary to $GOPATH/bin or ~/go/bin"

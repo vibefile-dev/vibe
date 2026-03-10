@@ -1,0 +1,7 @@
+vibe
+*.exe
+dist/
+.env
+
+# .vibe/compiled/ is intentionally NOT ignored — cached scripts should be
+# committed so CI use them without LLM calls.
