@@ -1,0 +1,11 @@
+recipe: run the Go tests for this project
+model: claude-sonnet-4-6
+variables:
+    model: claude-sonnet-4-6
+    name: skill-test-project
+context_files:
+    Vibefile: sha256:34829f59dac2a623b63f2b00def09ad05bbe2c210786154a86589f8c29d7c89b
+    go.mod: sha256:0cb25eaa89a86d17742a1dd259b2c33e7a3dc3da768201cef1fffc7c6f8c3038
+skill_hash: sha256:8afb5157ef53831aad2b79c8b955da0998268a11ad9fae049028f48cd1c13c66
+script_hash: sha256:ec73ff28ff393a590201810a5c7048f03972311e16cf65fa1e87b7d5c62c8a75
+generated_at: 2026-03-11T04:03:01.759824Z

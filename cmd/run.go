@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -14,7 +15,9 @@ import (
 	"github.com/vibefile-dev/vibe/executor"
 	"github.com/vibefile-dev/vibe/llm"
 	"github.com/vibefile-dev/vibe/parser"
+	"github.com/vibefile-dev/vibe/require"
 	"github.com/vibefile-dev/vibe/resolver"
+	"github.com/vibefile-dev/vibe/skill"
 	"github.com/vibefile-dev/vibe/ui"
 )
 
@@ -64,23 +67,49 @@ func runTarget(cmd *cobra.Command, args []string) error {
 
 	ui.DependencyChain(order)
 
+	projCfg, err := config.LoadProjectConfig(repoRoot)
+	if err != nil {
+		ui.Warn(fmt.Sprintf("could not load .vibe/config.yaml: %v", err))
+		projCfg = &config.ProjectConfig{}
+	}
+
 	for i, name := range order {
 		target := vf.Targets[name]
 
 		ui.TargetHeader(name, i+1, len(order))
 
+		if failed := require.Evaluate(repoRoot, target); len(failed) > 0 {
+			msgs := make([]string, len(failed))
+			for j, f := range failed {
+				msgs[j] = fmt.Sprintf("%s: %s", f.Condition, f.Message)
+			}
+			ui.Fail(fmt.Sprintf("@require failed:\n    %s", strings.Join(msgs, "\n    ")))
+			return fmt.Errorf("target %q: @require not met", name)
+		}
+
 		if target.ExecutionMode() == "agent" {
 			ui.Warn(fmt.Sprintf("%q — agent mode (@mcp) not yet supported, skipping", name))
 			continue
 		}
-		if target.ExecutionMode() == "skill" && target.Recipe == "" {
-			ui.Warn(fmt.Sprintf("%q — @skill resolution not yet supported, skipping", name))
-			continue
+
+		var skillInfo *skill.SkillInfo
+		if target.HasDirective("skill") {
+			skillName := target.DirectiveArgs("skill")
+			info, err := skill.Resolve(repoRoot, skillName, projCfg.SkillSources)
+			if err != nil {
+				ui.Fail(fmt.Sprintf("skill %q: %v", skillName, err))
+				return fmt.Errorf("target %q: skill resolution: %w", name, err)
+			}
+			ui.Step(fmt.Sprintf("Skill %q loaded from %s", skillName, info.FilePath))
+			if info.Description != "" {
+				ui.Info(fmt.Sprintf("description: %s", info.Description))
+			}
+			skillInfo = info
 		}
 
 		forceRecompile := recompileAll || (recompile && name == targetName)
 
-		if err := runCodegenTarget(repoRoot, vf, target, forceRecompile); err != nil {
+		if err := runCodegenTarget(repoRoot, vf, target, forceRecompile, skillInfo); err != nil {
 			return fmt.Errorf("target %q failed: %w", name, err)
 		}
 	}
@@ -89,7 +118,7 @@ func runTarget(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runCodegenTarget(repoRoot string, vf *parser.Vibefile, target *parser.Target, forceRecompile bool) error {
+func runCodegenTarget(repoRoot string, vf *parser.Vibefile, target *parser.Target, forceRecompile bool, skillInfo *skill.SkillInfo) error {
 	start := time.Now()
 	model := config.ResolveModel(target.Model, vf.Variables["model"])
 
@@ -106,7 +135,14 @@ func runCodegenTarget(repoRoot string, vf *parser.Vibefile, target *parser.Targe
 	if forceRecompile {
 		useCachedOnly = false
 	}
-	script, fromCache, err := resolveScript(repoRoot, vf, target, model, contextFiles, ctx, forceRecompile, useCachedOnly)
+
+	// For cache invalidation, hash the raw skill content
+	skillRawContent := ""
+	if skillInfo != nil {
+		skillRawContent = skillInfo.RawContent
+	}
+
+	script, fromCache, err := resolveScript(repoRoot, vf, target, model, contextFiles, ctx, forceRecompile, useCachedOnly, skillRawContent, skillInfo)
 	if err != nil {
 		return err
 	}
@@ -130,7 +166,7 @@ func runCodegenTarget(repoRoot string, vf *parser.Vibefile, target *parser.Targe
 		maxRetries = 0
 	}
 
-	return executeWithRetry(repoRoot, vf, target, model, contextFiles, ctx, script, fromCache, maxRetries, start)
+	return executeWithRetry(repoRoot, vf, target, model, contextFiles, ctx, script, fromCache, maxRetries, start, skillRawContent, skillInfo)
 }
 
 func executeWithRetry(
@@ -144,6 +180,8 @@ func executeWithRetry(
 	fromCache bool,
 	maxRetries int,
 	start time.Time,
+	skillRawContent string,
+	skillInfo *skill.SkillInfo,
 ) error {
 	attempt := 0
 
@@ -154,21 +192,21 @@ func executeWithRetry(
 		if result.IsSuccess() {
 			elapsed := time.Since(start).Round(time.Millisecond * 100)
 			sp.Success(fmt.Sprintf("%s completed %s", target.Name, formatDuration(elapsed)))
-			cacheScript(repoRoot, vf, target, model, contextFiles, script)
+			cacheScript(repoRoot, vf, target, model, contextFiles, skillRawContent, script)
 			return nil
 		}
 
 		if result.IsLegitimateFailure() {
 			elapsed := time.Since(start).Round(time.Millisecond * 100)
 			sp.Fail(fmt.Sprintf("%s — task found a problem (exit 1) %s", target.Name, formatDuration(elapsed)))
-			cacheScript(repoRoot, vf, target, model, contextFiles, script)
+			cacheScript(repoRoot, vf, target, model, contextFiles, skillRawContent, script)
 			return fmt.Errorf("exit code 1")
 		}
 
 		if result.IsPreconditionFailure() {
 			elapsed := time.Since(start).Round(time.Millisecond * 100)
 			sp.Fail(fmt.Sprintf("%s — missing prerequisite (exit 2) %s", target.Name, formatDuration(elapsed)))
-			cacheScript(repoRoot, vf, target, model, contextFiles, script)
+			cacheScript(repoRoot, vf, target, model, contextFiles, skillRawContent, script)
 			return fmt.Errorf("prerequisite not met (exit 2)")
 		}
 
@@ -186,14 +224,28 @@ func executeWithRetry(
 			}
 
 			client := llm.NewClient(apiKey, model)
+			var retrySkillEvents []llm.SkillEvent
+			client.OnSkillInvoked = func(evt llm.SkillEvent) {
+				retrySp.Update(fmt.Sprintf("Skill %q invoked by model (iteration %d)…", evt.SkillName, evt.Iteration))
+				retrySkillEvents = append(retrySkillEvents, evt)
+			}
+
 			retryPrompt := llm.BuildRetryPrompt(target, ctx, vf.Variables, script, result.CombinedOutput())
-			newScript, err := client.Generate(llm.SystemPrompt(), retryPrompt)
+
+			var skills []*skill.SkillInfo
+			if skillInfo != nil {
+				skills = []*skill.SkillInfo{skillInfo}
+			}
+			newScript, err := client.Generate(llm.SystemPrompt(), retryPrompt, skills)
 			if err != nil {
 				retrySp.Fail(fmt.Sprintf("LLM retry failed: %v", err))
 				return fmt.Errorf("LLM retry failed: %w", err)
 			}
 
 			retrySp.Success(fmt.Sprintf("Retry script generated (attempt %d/%d)", attempt, maxRetries))
+			for _, evt := range retrySkillEvents {
+				ui.Info(fmt.Sprintf("used skill %q (tool-use iteration %d)", evt.SkillName, evt.Iteration))
+			}
 			ui.PrintScript(target.Name, newScript, false)
 			script = newScript
 			fromCache = false
@@ -210,8 +262,8 @@ func executeWithRetry(
 	}
 }
 
-func cacheScript(repoRoot string, vf *parser.Vibefile, target *parser.Target, model string, contextFiles map[string]string, script string) {
-	lock := compiled.BuildLock(target, model, vf.Variables, contextFiles, script)
+func cacheScript(repoRoot string, vf *parser.Vibefile, target *parser.Target, model string, contextFiles map[string]string, skillRawContent, script string) {
+	lock := compiled.BuildLock(target, model, vf.Variables, contextFiles, skillRawContent, script)
 	if err := compiled.Save(repoRoot, target.Name, script, lock); err != nil {
 		ui.Warn(fmt.Sprintf("failed to cache compiled script: %v", err))
 	}
@@ -226,12 +278,14 @@ func resolveScript(
 	ctx *vibecontext.Collected,
 	forceRecompile bool,
 	cachedOnly bool,
+	skillRawContent string,
+	skillInfo *skill.SkillInfo,
 ) (string, bool, error) {
 
 	if !forceRecompile {
 		lock, err := compiled.LoadLock(repoRoot, target.Name)
 		if err == nil {
-			valid, reason := compiled.IsValid(lock, target, model, vf.Variables, contextFiles)
+			valid, reason := compiled.IsValid(lock, target, model, vf.Variables, contextFiles, skillRawContent)
 			if valid {
 				if script, ok := compiled.Load(repoRoot, target.Name); ok {
 					if compiled.IsHandEdited(repoRoot, target.Name, lock) {
@@ -276,14 +330,29 @@ func resolveScript(
 	sp := ui.NewSpinner(fmt.Sprintf("Generating script for %q (%s)…", target.Name, model))
 
 	client := llm.NewClient(apiKey, model)
+
+	var skillEvents []llm.SkillEvent
+	client.OnSkillInvoked = func(evt llm.SkillEvent) {
+		sp.Update(fmt.Sprintf("Skill %q invoked by model (iteration %d)…", evt.SkillName, evt.Iteration))
+		skillEvents = append(skillEvents, evt)
+	}
+
 	prompt := llm.BuildPrompt(target, ctx, vf.Variables)
-	script, err := client.Generate(llm.SystemPrompt(), prompt)
+
+	var skills []*skill.SkillInfo
+	if skillInfo != nil {
+		skills = []*skill.SkillInfo{skillInfo}
+	}
+	script, err := client.Generate(llm.SystemPrompt(), prompt, skills)
 	if err != nil {
 		sp.Fail(fmt.Sprintf("LLM generation failed: %v", err))
 		return "", false, fmt.Errorf("LLM generation: %w", err)
 	}
 
 	sp.Success("Script generated")
+	for _, evt := range skillEvents {
+		ui.Info(fmt.Sprintf("used skill %q (tool-use iteration %d)", evt.SkillName, evt.Iteration))
+	}
 	return script, false, nil
 }
 

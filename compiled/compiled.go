@@ -20,6 +20,7 @@ type LockFile struct {
 	Model        string            `yaml:"model"`
 	Variables    map[string]string `yaml:"variables,omitempty"`
 	ContextFiles map[string]string `yaml:"context_files,omitempty"` // filename → sha256
+	SkillHash    string            `yaml:"skill_hash,omitempty"`
 	ScriptHash   string            `yaml:"script_hash"`
 	GeneratedAt  time.Time         `yaml:"generated_at"`
 }
@@ -45,7 +46,8 @@ func LockPath(repoRoot, targetName string) string {
 }
 
 // BuildLock creates a LockFile from the current inputs for a target.
-func BuildLock(target *parser.Target, model string, vars map[string]string, contextFiles map[string]string, script string) *LockFile {
+// skillInstructions is the resolved SKILL.md content (empty if no skill is used).
+func BuildLock(target *parser.Target, model string, vars map[string]string, contextFiles map[string]string, skillInstructions, script string) *LockFile {
 	lock := &LockFile{
 		Recipe:       parser.SubstituteVars(target.Recipe, vars),
 		Model:        model,
@@ -53,6 +55,10 @@ func BuildLock(target *parser.Target, model string, vars map[string]string, cont
 		ContextFiles: make(map[string]string),
 		ScriptHash:   hash([]byte(script)),
 		GeneratedAt:  time.Now().UTC(),
+	}
+
+	if skillInstructions != "" {
+		lock.SkillHash = hash([]byte(skillInstructions))
 	}
 
 	for k, v := range vars {
@@ -116,7 +122,8 @@ func LoadLock(repoRoot, targetName string) (*LockFile, error) {
 // IsValid checks whether the cached compiled output is still valid given
 // current inputs. Returns true if the cache can be used, false if recompilation
 // is needed. The reason string explains what changed.
-func IsValid(lock *LockFile, target *parser.Target, model string, vars map[string]string, contextFiles map[string]string) (bool, string) {
+// skillInstructions is the current resolved SKILL.md content (empty if no skill).
+func IsValid(lock *LockFile, target *parser.Target, model string, vars map[string]string, contextFiles map[string]string, skillInstructions string) (bool, string) {
 	currentRecipe := parser.SubstituteVars(target.Recipe, vars)
 	if lock.Recipe != currentRecipe {
 		return false, "recipe changed"
@@ -128,6 +135,14 @@ func IsValid(lock *LockFile, target *parser.Target, model string, vars map[strin
 
 	if !mapsEqual(lock.Variables, vars) {
 		return false, "variables changed"
+	}
+
+	currentSkillHash := ""
+	if skillInstructions != "" {
+		currentSkillHash = hash([]byte(skillInstructions))
+	}
+	if lock.SkillHash != currentSkillHash {
+		return false, "skill changed"
 	}
 
 	for name, content := range contextFiles {
@@ -144,8 +159,6 @@ func IsValid(lock *LockFile, target *parser.Target, model string, vars map[strin
 		}
 	}
 
-	// Check if the .sh file was hand-edited (script hash mismatch).
-	// We still return valid=true but the caller can warn.
 	return true, ""
 }
 
@@ -170,7 +183,7 @@ type Status struct {
 }
 
 // GetStatus returns the cache status for a single target.
-func GetStatus(repoRoot string, target *parser.Target, model string, vars map[string]string, contextFiles map[string]string) Status {
+func GetStatus(repoRoot string, target *parser.Target, model string, vars map[string]string, contextFiles map[string]string, skillInstructions string) Status {
 	s := Status{Name: target.Name}
 
 	lock, err := LoadLock(repoRoot, target.Name)
@@ -186,7 +199,7 @@ func GetStatus(repoRoot string, target *parser.Target, model string, vars map[st
 	s.GeneratedAt = lock.GeneratedAt
 	s.HandEdited = IsHandEdited(repoRoot, target.Name, lock)
 
-	valid, reason := IsValid(lock, target, model, vars, contextFiles)
+	valid, reason := IsValid(lock, target, model, vars, contextFiles, skillInstructions)
 	s.Valid = valid
 	s.Reason = reason
 
