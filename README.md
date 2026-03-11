@@ -1,5 +1,18 @@
 # vibe
 
+<div align="center">
+    <a href="https://github.com/vibefile-dev/vibe/releases">
+      <img src="https://img.shields.io/github/v/release/vibefile-dev/vibe?style=flat&label=Latest%20version" alt="Release">
+    </a>
+    <a href="https://github.com/vibefile-dev/vibe/actions/workflows/ci.yml">
+      <img src="https://github.com/vibefile-dev/vibe/actions/workflows/ci.yml/badge.svg" alt="Build Status" height="20">
+    </a>
+     <a href="https://discord.gg/3TsMMvK8tV">
+      <img src="https://img.shields.io/discord/1480004846324027578?style=flat&label=Join%20Discord" alt="Discord">
+     </a>
+</div>
+---
+
 AI-powered task runner driven by plain-English recipes. An MVP implementation of the [Vibefile spec](https://github.com/vibefile-dev/spec).
 
 ## Install
