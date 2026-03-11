@@ -1,0 +1,15 @@
+model = claude-sonnet-4-6
+name  = skill-test-project
+
+# Uses the go-test skill for testing
+test:
+    @skill go-test
+    "run the Go tests for this project"
+
+# A regular target without skills for comparison
+build:
+    "compile the Go binary from the module root"
+
+# Depends on the skill-based test target
+check: test build:
+    "print a summary — all quality gates passed"

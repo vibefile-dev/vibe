@@ -11,9 +11,10 @@ import (
 
 // VibeConfig represents the ~/.vibeconfig file.
 type VibeConfig struct {
-	DefaultModel string `yaml:"default_model"`
-	AnthropicKey string `yaml:"anthropic_key"`
-	OpenAIKey    string `yaml:"openai_key"`
+	DefaultModel string            `yaml:"default_model"`
+	AnthropicKey string            `yaml:"anthropic_key"`
+	OpenAIKey    string            `yaml:"openai_key"`
+	ServerTokens map[string]string `yaml:"server_tokens,omitempty"`
 }
 
 // ResolveAPIKey resolves the API key using the priority chain:
@@ -89,6 +90,12 @@ func (c *VibeConfig) keyForModel(model string) string {
 	default:
 		return ""
 	}
+}
+
+// LoadVibeConfig reads and parses ~/.vibeconfig. Returns nil and an error
+// if the file doesn't exist or can't be parsed.
+func LoadVibeConfig() (*VibeConfig, error) {
+	return loadVibeConfig()
 }
 
 func loadVibeConfig() (*VibeConfig, error) {

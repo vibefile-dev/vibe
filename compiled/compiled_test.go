@@ -43,7 +43,7 @@ func TestSaveAndLoad(t *testing.T) {
 	vars := map[string]string{"env": "prod"}
 	script := "#!/bin/bash\ngo build ."
 
-	lock := BuildLock(target, "claude-sonnet-4-6", vars, nil, script)
+	lock := BuildLock(target, "claude-sonnet-4-6", vars, nil, "", script)
 	if err := Save(tmp, "build", script, lock); err != nil {
 		t.Fatalf("Save: %v", err)
 	}
@@ -82,9 +82,9 @@ func TestIsValidUnchanged(t *testing.T) {
 	ctx := map[string]string{"go.mod": "module example"}
 	script := "#!/bin/bash\ngo build ."
 
-	lock := BuildLock(target, "claude-sonnet-4-6", vars, ctx, script)
+	lock := BuildLock(target, "claude-sonnet-4-6", vars, ctx, "", script)
 
-	valid, reason := IsValid(lock, target, "claude-sonnet-4-6", vars, ctx)
+	valid, reason := IsValid(lock, target, "claude-sonnet-4-6", vars, ctx, "")
 	if !valid {
 		t.Errorf("expected valid, got invalid: %s", reason)
 	}
@@ -92,10 +92,10 @@ func TestIsValidUnchanged(t *testing.T) {
 
 func TestIsValidRecipeChanged(t *testing.T) {
 	target := &parser.Target{Name: "build", Recipe: "compile"}
-	lock := BuildLock(target, "claude-sonnet-4-6", nil, nil, "script")
+	lock := BuildLock(target, "claude-sonnet-4-6", nil, nil, "", "script")
 
 	target.Recipe = "compile and test"
-	valid, reason := IsValid(lock, target, "claude-sonnet-4-6", nil, nil)
+	valid, reason := IsValid(lock, target, "claude-sonnet-4-6", nil, nil, "")
 	if valid {
 		t.Error("expected invalid when recipe changed")
 	}
@@ -106,9 +106,9 @@ func TestIsValidRecipeChanged(t *testing.T) {
 
 func TestIsValidModelChanged(t *testing.T) {
 	target := &parser.Target{Name: "build", Recipe: "compile"}
-	lock := BuildLock(target, "claude-sonnet-4-6", nil, nil, "script")
+	lock := BuildLock(target, "claude-sonnet-4-6", nil, nil, "", "script")
 
-	valid, reason := IsValid(lock, target, "gpt-4o", nil, nil)
+	valid, reason := IsValid(lock, target, "gpt-4o", nil, nil, "")
 	if valid {
 		t.Error("expected invalid when model changed")
 	}
@@ -120,10 +120,10 @@ func TestIsValidModelChanged(t *testing.T) {
 func TestIsValidVariablesChanged(t *testing.T) {
 	target := &parser.Target{Name: "build", Recipe: "compile"}
 	vars := map[string]string{"env": "prod"}
-	lock := BuildLock(target, "model", vars, nil, "script")
+	lock := BuildLock(target, "model", vars, nil, "", "script")
 
 	newVars := map[string]string{"env": "staging"}
-	valid, _ := IsValid(lock, target, "model", newVars, nil)
+	valid, _ := IsValid(lock, target, "model", newVars, nil, "")
 	if valid {
 		t.Error("expected invalid when variables changed")
 	}
@@ -131,10 +131,10 @@ func TestIsValidVariablesChanged(t *testing.T) {
 
 func TestIsValidContextFileAdded(t *testing.T) {
 	target := &parser.Target{Name: "build", Recipe: "compile"}
-	lock := BuildLock(target, "model", nil, nil, "script")
+	lock := BuildLock(target, "model", nil, nil, "", "script")
 
 	newCtx := map[string]string{"go.mod": "module new"}
-	valid, reason := IsValid(lock, target, "model", nil, newCtx)
+	valid, reason := IsValid(lock, target, "model", nil, newCtx, "")
 	if valid {
 		t.Error("expected invalid when context file added")
 	}
@@ -146,9 +146,9 @@ func TestIsValidContextFileAdded(t *testing.T) {
 func TestIsValidContextFileRemoved(t *testing.T) {
 	target := &parser.Target{Name: "build", Recipe: "compile"}
 	ctx := map[string]string{"go.mod": "module old"}
-	lock := BuildLock(target, "model", nil, ctx, "script")
+	lock := BuildLock(target, "model", nil, ctx, "", "script")
 
-	valid, reason := IsValid(lock, target, "model", nil, nil)
+	valid, reason := IsValid(lock, target, "model", nil, nil, "")
 	if valid {
 		t.Error("expected invalid when context file removed")
 	}
@@ -157,11 +157,24 @@ func TestIsValidContextFileRemoved(t *testing.T) {
 	}
 }
 
+func TestIsValidSkillChanged(t *testing.T) {
+	target := &parser.Target{Name: "test", Recipe: "run tests"}
+	lock := BuildLock(target, "model", nil, nil, "old skill instructions", "script")
+
+	valid, reason := IsValid(lock, target, "model", nil, nil, "new skill instructions")
+	if valid {
+		t.Error("expected invalid when skill changed")
+	}
+	if reason != "skill changed" {
+		t.Errorf("unexpected reason: %s", reason)
+	}
+}
+
 func TestIsHandEdited(t *testing.T) {
 	tmp := t.TempDir()
 	target := &parser.Target{Name: "build", Recipe: "compile"}
 	script := "#!/bin/bash\ngo build ."
-	lock := BuildLock(target, "model", nil, nil, script)
+	lock := BuildLock(target, "model", nil, nil, "", script)
 
 	if err := Save(tmp, "build", script, lock); err != nil {
 		t.Fatalf("Save: %v", err)

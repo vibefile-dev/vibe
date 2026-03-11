@@ -24,6 +24,7 @@ import (
 var (
 	initLanguage string
 	initForce    bool
+	initEmpty    bool
 )
 
 var initCmd = &cobra.Command{
@@ -35,7 +36,10 @@ Makefile, etc.) and generate a Vibefile with sensible default targets.
 
 For monorepos, subdirectories are scanned automatically when no language is
 detected at the root. Each subdirectory's targets are prefixed with the
-directory name (e.g. go-build, ui-dev). No LLM call required.`,
+directory name (e.g. go-build, ui-dev). No LLM call required.
+
+Use --empty to create a minimal skeleton Vibefile without auto-detection,
+suitable for projects where you want to define targets manually.`,
 	Args: cobra.NoArgs,
 	RunE: runInit,
 }
@@ -43,6 +47,7 @@ directory name (e.g. go-build, ui-dev). No LLM call required.`,
 func init() {
 	initCmd.Flags().StringVar(&initLanguage, "language", "", "Skip detection and use a specific language template (e.g. go)")
 	initCmd.Flags().BoolVar(&initForce, "force", false, "Overwrite existing Vibefile")
+	initCmd.Flags().BoolVar(&initEmpty, "empty", false, "Create a minimal skeleton Vibefile without auto-detected targets")
 	rootCmd.AddCommand(initCmd)
 }
 
@@ -59,6 +64,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 		if _, err := os.Stat(vibePath); err == nil {
 			return fmt.Errorf("Vibefile already exists (use --force to overwrite)")
 		}
+	}
+
+	// --- Empty skeleton ---
+	if initEmpty {
+		return initEmptyVibefile(repoRoot, vibePath)
 	}
 
 	// --- Explicit language flag: single-project mode ---
@@ -92,6 +102,44 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	sp.Success(fmt.Sprintf("Monorepo detected — %d sub-projects found", len(subProjects)))
 	return initMonorepo(repoRoot, vibePath, subProjects)
+}
+
+// initEmptyVibefile creates a minimal skeleton Vibefile with no auto-detected targets.
+func initEmptyVibefile(repoRoot, vibePath string) error {
+	projectName := filepath.Base(repoRoot)
+	slog.Debug("init: empty mode", "project_name", projectName)
+
+	content := emptyVibefileContent(projectName)
+
+	if err := os.WriteFile(vibePath, []byte(content), 0o644); err != nil {
+		return fmt.Errorf("write Vibefile: %w", err)
+	}
+
+	ui.Success("Empty Vibefile created")
+	ui.Info("Edit the Vibefile to add your targets, then run \"vibe list\" to verify")
+
+	return nil
+}
+
+func emptyVibefileContent(projectName string) string {
+	return fmt.Sprintf(`model = claude-sonnet-4-6
+name  = %s
+
+# Add your targets below. Each target has a name, an optional dependency
+# list, and a plain-English recipe describing what the task should do.
+#
+# Example:
+#
+# build:
+#     "compile the project for production"
+#
+# test:
+#     "run all tests with verbose output"
+#
+# deploy: test build:
+#     "deploy to production and verify health"
+#     @require clean git status
+`, projectName)
 }
 
 // initSingleProjectExplicit handles --language flag

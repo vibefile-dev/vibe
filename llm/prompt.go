@@ -48,6 +48,8 @@ func SystemPrompt() string {
 }
 
 // BuildPrompt constructs the full prompt sent to the LLM for a codegen target.
+// Skills are not included here — they are provided to the model as tools via
+// the Anthropic tool-calling API.
 func BuildPrompt(target *parser.Target, ctx *vibecontext.Collected, vars map[string]string) string {
 	recipe := parser.SubstituteVars(target.Recipe, vars)
 

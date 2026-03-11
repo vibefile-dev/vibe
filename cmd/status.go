@@ -10,6 +10,7 @@ import (
 	"github.com/vibefile-dev/vibe/compiled"
 	"github.com/vibefile-dev/vibe/config"
 	vibecontext "github.com/vibefile-dev/vibe/context"
+	"github.com/vibefile-dev/vibe/skill"
 	"github.com/vibefile-dev/vibe/ui"
 )
 
@@ -54,6 +55,11 @@ func showStatus(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	projCfg, err := config.LoadProjectConfig(repoRoot)
+	if err != nil {
+		projCfg = &config.ProjectConfig{}
+	}
+
 	for _, name := range vf.Order {
 		target := vf.Targets[name]
 		model := config.ResolveModel(target.Model, vf.Variables["model"])
@@ -69,7 +75,16 @@ func showStatus(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
-		s := compiled.GetStatus(repoRoot, target, model, vf.Variables, ctx.HashableFiles())
+		skillRawContent := ""
+		if target.HasDirective("skill") {
+			skillName := target.DirectiveArgs("skill")
+			info, err := skill.Resolve(repoRoot, skillName, projCfg.SkillSources)
+			if err == nil {
+				skillRawContent = info.RawContent
+			}
+		}
+
+		s := compiled.GetStatus(repoRoot, target, model, vf.Variables, ctx.HashableFiles(), skillRawContent)
 
 		if !s.Compiled {
 			ui.StatusLine(name, statusDim.Sprint("○"), statusDim.Sprint("not compiled"), maxName)

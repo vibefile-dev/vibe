@@ -113,6 +113,31 @@ test:
 	}
 }
 
+func TestParseSkillWithRecipe(t *testing.T) {
+	input := `
+test:
+    @skill go-test
+    "run the Go tests for this project"
+`
+	vf, err := Parse(input)
+	if err != nil {
+		t.Fatalf("unexpected parse error: %v", err)
+	}
+	test := vf.Targets["test"]
+	if !test.HasDirective("skill") {
+		t.Error("expected test target to have @skill directive")
+	}
+	if test.DirectiveArgs("skill") != "go-test" {
+		t.Errorf("expected skill arg go-test, got %q", test.DirectiveArgs("skill"))
+	}
+	if test.Recipe != "run the Go tests for this project" {
+		t.Errorf("unexpected recipe: %q", test.Recipe)
+	}
+	if test.ExecutionMode() != "skill" {
+		t.Errorf("expected skill mode, got %q", test.ExecutionMode())
+	}
+}
+
 func TestSubstituteVars(t *testing.T) {
 	vars := map[string]string{"env": "production", "project": "myapp"}
 	result := SubstituteVars("deploy $(project) to $(env)", vars)
