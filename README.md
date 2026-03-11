@@ -11,6 +11,7 @@
       <img src="https://img.shields.io/discord/1480004846324027578?style=flat&label=Join%20Discord" alt="Discord">
      </a>
 </div>
+
 ---
 
 AI-powered task runner driven by plain-English recipes. An MVP implementation of the [Vibefile spec](https://github.com/vibefile-dev/spec).
