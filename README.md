@@ -1,5 +1,3 @@
-# vibe
-
 <div align="center">
     <picture>
         <img alt="vibe" src="https://raw.githubusercontent.com/vibefile-dev/vibe/main/img/vibefile-logo.svg"/>
