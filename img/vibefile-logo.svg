@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="602" height="158" viewBox="0 0 602 158">
+  <rect x="0" y="0" width="602" height="158" rx="12" fill="#0b0c0e"/>
+  <rect x="0" y="0" width="602" height="158" rx="12" fill="none" stroke="#1f2330" stroke-width="2"/>
+  <text
+    x="40"
+    y="118"
+    font-family="'JetBrains Mono', monospace"
+    font-size="112"
+    letter-spacing="-4"
+  ><tspan font-weight="800" fill="#b8ff57">vibe</tspan><tspan font-weight="200" fill="#555e72">file</tspan></text>
+</svg>

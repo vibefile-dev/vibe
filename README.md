@@ -1,6 +1,10 @@
 # vibe
 
 <div align="center">
+    <picture>
+        <img alt="vibe" src="https://raw.githubusercontent.com/vibefile-dev/vibe/main/img/vibefile-logo.svg"/>
+    </picture>
+    <div>
     <a href="https://github.com/vibefile-dev/vibe/releases">
       <img src="https://img.shields.io/github/v/release/vibefile-dev/vibe?style=flat&label=Latest%20version" alt="Release">
     </a>
@@ -10,6 +14,7 @@
      <a href="https://discord.gg/3TsMMvK8tV">
       <img src="https://img.shields.io/discord/1480004846324027578?style=flat&label=Join%20Discord" alt="Discord">
      </a>
+     </div>
 </div>
 
 ---
