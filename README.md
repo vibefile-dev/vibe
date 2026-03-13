@@ -21,8 +21,10 @@ AI-powered task runner driven by plain-English recipes. An MVP implementation of
 
 ## Install
 
+Download the CLI:
+
 ```bash
-go install github.com/vibefile-dev/vibe@latest
+curl -sSL https://get.vibefile.dev | bash
 ```
 
 Or build from source:
