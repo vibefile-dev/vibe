@@ -106,7 +106,7 @@ func (p *TemplateProvider) Provide(project *detect.ProjectInfo) *detect.Template
 		Name:         "check",
 		Section:      "quality gates",
 		Dependencies: checkDeps,
-		Recipe:       "print a summary of what passed — all quality gates complete",
+		Recipe:       "echo all quality gates passed",
 	})
 
 	t.Targets = append(t.Targets,

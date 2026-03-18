@@ -68,7 +68,7 @@ func (p *TemplateProvider) provideSingleModule(project *detect.ProjectInfo) *det
 			Name:         "check",
 			Section:      "quality gates",
 			Dependencies: []string{"fmt", "vet", "lint", "test"},
-			Recipe:       "print a summary of what passed — all quality gates complete",
+			Recipe:       "echo all quality gates passed",
 		},
 		detect.TemplateTarget{
 			Name:    "clean",
@@ -140,7 +140,7 @@ func (p *TemplateProvider) provideWorkspace(project *detect.ProjectInfo) *detect
 			Name:         "check",
 			Section:      "quality gates",
 			Dependencies: []string{"fmt", "vet", "lint", "test"},
-			Recipe:       "print a summary of what passed — all quality gates complete",
+			Recipe:       "echo all quality gates passed",
 		},
 		detect.TemplateTarget{
 			Name:    "clean",

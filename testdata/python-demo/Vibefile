@@ -1,0 +1,40 @@
+model = claude-sonnet-4-6
+name  = demo
+
+# ── development ───────────────────────────────
+
+run:
+    "run the demo CLI entry point using uv run"
+
+
+# ── build & test ──────────────────────────────
+
+test:
+    "run all Python tests with pytest and verbose output using uv run"
+
+lint:
+    "run ruff check on the entire project using uv run"
+
+fmt:
+    "format all Python files using ruff format using uv run"
+
+typecheck:
+    "run mypy on the project using uv run"
+
+build:
+    "build the Python package using uv run"
+
+
+# ── housekeeping ──────────────────────────────
+
+install:
+    "install all dependencies using uv sync --frozen --all-extras, then run pre-commit install --install-hooks if pre-commit is available"
+
+clean:
+    "remove __pycache__, .pytest_cache, dist/, build/, *.egg-info, and .coverage"
+
+
+# ── quality gates ─────────────────────────────
+
+check: fmt lint typecheck test:
+    "echo all quality gates passed"
