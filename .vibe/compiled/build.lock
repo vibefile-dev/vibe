@@ -5,7 +5,7 @@ variables:
     module: github.com/vibefile-dev/vibe
     name: vibe
 context_files:
-    Vibefile: sha256:7ccc4837d0b5157fb2fe167eabf2601d1f7c159875fc266f134f74b6e622826f
-    go.mod: sha256:91a1588eed67a8aca61ed7f49fbb42a788bfb1d04f28491506a48037305d65ec
-script_hash: sha256:133b18038740b117f33b71100dac57ac66da5a51b4dcba317c260d469195782c
-generated_at: 2026-03-10T04:36:46.013495Z
+    Vibefile: sha256:6e3de29a877cd2f91b5e2a736c028504ea4f0dd0d2aeeaacf3b391924dd596ba
+    go.mod: sha256:b4a3b456bb05ada6f8b23bcce9d77bdb7e6060c866ae48b9fc8477f8abc8fa3b
+script_hash: sha256:49203c18b2ff4c2bb7d6291b0771d062a66daf1e818aefed131fcc80a0c52cd8
+generated_at: 2026-03-13T22:55:22.302624Z

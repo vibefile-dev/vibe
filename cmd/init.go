@@ -17,6 +17,7 @@ import (
 	_ "github.com/vibefile-dev/vibe/detect/helm"
 	_ "github.com/vibefile-dev/vibe/detect/makefile"
 	_ "github.com/vibefile-dev/vibe/detect/nextjs"
+	_ "github.com/vibefile-dev/vibe/detect/python"
 	_ "github.com/vibefile-dev/vibe/detect/vercel"
 	"github.com/vibefile-dev/vibe/ui"
 )

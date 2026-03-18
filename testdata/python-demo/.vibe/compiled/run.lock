@@ -1,0 +1,10 @@
+recipe: run the demo CLI entry point using uv run
+model: claude-sonnet-4-6
+variables:
+    model: claude-sonnet-4-6
+    name: demo
+context_files:
+    Vibefile: sha256:273772191c2162b15681ce9111fa95de62563e88e46cb4ff34e8bda5f76fbc3e
+    pyproject.toml: sha256:25ce5fa196ac5c4c9d58097784dc4e3944611404578d596a810a01aa88cfe8d3
+script_hash: sha256:ab946971276a695eac8c0b1da59066c51b3c75791fd60c19e1bb12e0a80069bd
+generated_at: 2026-03-13T22:56:21.838163Z

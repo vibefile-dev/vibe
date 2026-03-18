@@ -7,5 +7,5 @@ if ! command -v go &> /dev/null; then
   exit 2
 fi
 
-# Build the binary
+# Compile the Go binary named vibe from the module root
 go build -o vibe .
