@@ -73,6 +73,22 @@ func Collect(repoRoot string, target *parser.Target) (*Collected, error) {
 			c.ProjectFiles[f] = string(data)
 		}
 	}
+// Include already-compiled scripts so LLM stays style-consistent
+	compiledDir := filepath.Join(repoRoot, ".vibe", "compiled")
+	if entries, err := os.ReadDir(compiledDir); err == nil {
+		for _, entry := range entries {
+			name := entry.Name()
+			if !entry.IsDir() && filepath.Ext(name) == ".sh" {
+				if name != target.Name+".sh" {
+					key := filepath.Join(".vibe", "compiled", name)
+					path := filepath.Join(compiledDir, name)
+					if data, err := os.ReadFile(path); err == nil {
+						c.ProjectFiles[key] = string(data)
+					}
+				}
+			}
+		}
+	}
 
 	if gitStatus, err := runGitStatus(repoRoot); err == nil {
 		c.GitStatus = gitStatus
@@ -104,6 +120,16 @@ func inferTaskFiles(target *parser.Target) []string {
 		files = append(files, "schema.sql", "schema.prisma", "prisma/schema.prisma")
 	}
 
+        // Include common shell scripts based on target name/recipe
+	commonShellScripts := []string{
+		"build.sh", "deploy.sh", "test.sh", "run.sh",
+		"setup.sh", "install.sh", "release.sh", "lint.sh", "ci.sh",
+	}
+	for _, script := range commonShellScripts {
+		if containsAny(combined, strings.TrimSuffix(script, ".sh")) {
+			files = append(files, script)
+		}
+	}
 	return files
 }
 
