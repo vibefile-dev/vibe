@@ -153,3 +153,32 @@ func TestInferTaskFilesNoMatchReturnsEmpty(t *testing.T) {
 		t.Errorf("expected no inferred files, got %v", files)
 	}
 }
+func TestInferTaskFilesIncludesShellScripts(t *testing.T) {
+	target := &parser.Target{Name: "build", Recipe: "compile the app"}
+	files := inferTaskFiles(target)
+	found := false
+	for _, f := range files {
+		if f == "build.sh" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected build.sh to be included for build target")
+	}
+}
+
+func TestInferTaskFilesDeployIncludesDeploySh(t *testing.T) {
+	target := &parser.Target{Name: "deploy", Recipe: "deploy to fly.io"}
+	files := inferTaskFiles(target)
+	found := false
+	for _, f := range files {
+		if f == "deploy.sh" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected deploy.sh to be included for deploy target")
+	}
+}
